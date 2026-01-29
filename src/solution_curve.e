@@ -19,8 +19,8 @@ feature {NONE} -- Initialization
 			t_start := a_t_start
 			t_end := a_t_end
 			dimension := a_dimension
-			create solution_points.make
-			create time_points.make
+			create solution_points.make (100)
+			create time_points.make (100)
 		ensure
 			t_start_set: t_start = a_t_start
 			t_end_set: t_end = a_t_end
