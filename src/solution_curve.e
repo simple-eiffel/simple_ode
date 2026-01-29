@@ -19,6 +19,8 @@ feature {NONE} -- Initialization
 			t_start := a_t_start
 			t_end := a_t_end
 			dimension := a_dimension
+			create solution_points.make
+			create time_points.make
 		ensure
 			t_start_set: t_start = a_t_start
 			t_end_set: t_end = a_t_end
@@ -36,34 +38,76 @@ feature -- Access
 	dimension: INTEGER
 			-- Problem dimension
 
+feature -- Modification
+
+	add_solution_point (a_t: REAL_64; a_y: ARRAY [REAL_64])
+			-- Store solution point at time a_t.
+		require
+			valid_time: a_t >= t_start and a_t <= t_end
+			valid_dimension: a_y.count = dimension
+		local
+			l_y_copy: ARRAY [REAL_64]
+			i: INTEGER
+		do
+			create l_y_copy.make_filled (0.0, 1, dimension)
+			from i := 1 until i > dimension loop
+				l_y_copy [i] := a_y [i]
+				i := i + 1
+			end
+			time_points.extend (a_t)
+			solution_points.extend (l_y_copy)
+		ensure
+			point_added: time_points.count = old time_points.count + 1
+		end
+
 feature -- Query
 
 	interpolate (a_t: REAL_64): ARRAY [REAL_64]
-			-- Interpolated solution at time a_t.
+			-- Interpolated solution at time a_t via linear interpolation.
 		require
 			in_range: a_t >= t_start and a_t <= t_end
 		local
 			l_result: ARRAY [REAL_64]
 			l_alpha: REAL_64
+			l_i: INTEGER
+			l_i_next: INTEGER
+			l_t1, l_t2: REAL_64
+			l_y1, l_y2: ARRAY [REAL_64]
 			i: INTEGER
 		do
-			-- Simple linear interpolation between start and end times
-			-- For production, this should use stored solution points
-			-- This is a placeholder implementation
 			create l_result.make_filled (0.0, 1, dimension)
 
-			-- Linear interpolation factor (0 at t_start, 1 at t_end)
-			if (t_end - t_start).abs > 0.0001 then
-				l_alpha := (a_t - t_start) / (t_end - t_start)
+			if time_points.count < 2 then
+				-- No stored points; return zero vector (degenerate case)
+				Result := l_result
 			else
-				l_alpha := 0.0
-			end
+				-- Find the two adjacent stored points that bracket a_t
+				from l_i := 1 until l_i > time_points.count - 1 loop
+					if time_points [l_i] <= a_t and a_t <= time_points [l_i + 1] then
+						l_i_next := l_i + 1
 
-			-- For now, just return midpoint value (would need stored solution points for real interpolation)
-			-- This is a stub that satisfies the contract
-			from i := 1 until i > dimension loop
-				l_result [i] := 0.0  -- Would interpolate from stored solution curve
-				i := i + 1
+						l_t1 := time_points [l_i]
+						l_t2 := time_points [l_i_next]
+						l_y1 := solution_points [l_i]
+						l_y2 := solution_points [l_i_next]
+
+						-- Linear interpolation factor
+						if (l_t2 - l_t1).abs > 0.0001 then
+							l_alpha := (a_t - l_t1) / (l_t2 - l_t1)
+						else
+							l_alpha := 0.0
+						end
+
+						-- Interpolate each dimension
+						from i := 1 until i > dimension loop
+							l_result [i] := l_y1 [i] + l_alpha * (l_y2 [i] - l_y1 [i])
+							i := i + 1
+						end
+
+						l_i := time_points.count  -- Exit loop
+					end
+					l_i := l_i + 1
+				end
 			end
 
 			Result := l_result
@@ -72,8 +116,17 @@ feature -- Query
 			correct_dimension: Result.count = dimension
 		end
 
+feature {NONE} -- Implementation
+
+	solution_points: ARRAYED_LIST [ARRAY [REAL_64]]
+			-- Stored solution vectors at each time point
+
+	time_points: ARRAYED_LIST [REAL_64]
+			-- Time values at each solution point
+
 invariant
 	time_increasing: t_start < t_end
 	positive_dimension: dimension > 0
+	points_synchronized: solution_points.count = time_points.count
 
 end
