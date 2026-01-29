@@ -29,6 +29,9 @@ feature {NONE} -- Initialization
 			test_simple_ode
 
 			print_summary
+
+			-- Phase 6: Adversarial tests
+			create l_adversarial.make
 		end
 
 feature {NONE} -- Tests
@@ -145,5 +148,6 @@ feature {NONE} -- Implementation
 	passed: INTEGER
 	failed: INTEGER
 	failed_flag: BOOLEAN
+	l_adversarial: TEST_ADVERSARIAL
 
 end
