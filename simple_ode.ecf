@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<system name="simple_ode" uuid="87654321-4321-8765-4321-876543218765">
+	<target name="simple_ode">
+		<description>ODE solver with RK2, RK4, RK45 methods and adaptive stepping</description>
+		<root class="SIMPLE_ODE" feature="make"/>
+		<option warning="true" void_safety="all">
+			<assertions precondition="true" postcondition="true" invariant="true" check="true"/>
+			<concurrency support="scoop"/>
+		</option>
+		<capability>
+			<concurrency support="scoop"/>
+			<void_safety support="all"/>
+		</capability>
+		<library name="base" location="$ISE_LIBRARY/library/base/base.ecf"/>
+		<library name="testing" location="$ISE_LIBRARY/library/testing/testing.ecf"/>
+		<library name="simple_math" location="d:\prod\simple_math\simple_math.ecf"/>
+		<library name="simple_mml" location="d:\prod\simple_mml\simple_mml.ecf"/>
+		<cluster name="src" location=".\src\" recursive="true"/>
+	</target>
+	<target name="simple_ode_tests">
+		<description>Test suite for ODE solver</description>
+		<root class="TEST_APP" feature="make"/>
+		<option warning="true" void_safety="all">
+			<assertions precondition="true" postcondition="true" invariant="true" check="true"/>
+			<concurrency support="scoop"/>
+		</option>
+		<capability>
+			<concurrency support="scoop"/>
+			<void_safety support="all"/>
+		</capability>
+		<library name="base" location="$ISE_LIBRARY/library/base/base.ecf"/>
+		<library name="testing" location="$ISE_LIBRARY/library/testing/testing.ecf"/>
+		<library name="simple_math" location="d:\prod\simple_math\simple_math.ecf"/>
+		<library name="simple_mml" location="d:\prod\simple_mml\simple_mml.ecf"/>
+		<cluster name="src" location=".\src\" recursive="true"/>
+		<cluster name="test" location=".\test\" recursive="true"/>
+	</target>
+</system>

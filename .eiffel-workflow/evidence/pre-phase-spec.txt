@@ -1,0 +1,154 @@
+# Pre-Phase Specification Evidence
+# Project: d:\prod\simple_ode
+# Date: 2026-01-29
+
+Specification completed: YES
+Steps completed: 8/8
+
+## Documents Created
+- 01-PARSED-REQUIREMENTS.md (parsed from research, 14 FR + 8 NFR)
+- 02-DOMAIN-MODEL.md (6 domain concepts, relationships)
+- 03-CHALLENGED-ASSUMPTIONS.md (7 assumptions challenged, scope refined)
+- 04-CLASS-DESIGN.md (9 classes designed with OOSC2 principles)
+- 05-CONTRACT-DESIGN.md (full require/ensure/invariant with RK45 error bounds)
+- 06-INTERFACE-DESIGN.md (fluent API, builder pattern, dense output)
+- 07-SPECIFICATION.md (formal Eiffel class skeletons with contracts)
+- 08-VALIDATION.md (OOSC2 compliance, requirements traceability, risk mitigations)
+
+## Classes Designed
+1. SIMPLE_ODE (facade entry point)
+2. ODE_SOLVER (orchestrator with adaptive stepping)
+3. RK2_INTEGRATOR (2-stage Runge-Kutta)
+4. RK4_INTEGRATOR (4-stage Runge-Kutta)
+5. RK45_INTEGRATOR (6-stage with RK45 pair + error estimation)
+6. ODE_STATE (current solution state)
+7. ODE_CONFIG (solver configuration)
+8. ODE_RESULT (immutable step results)
+9. SOLUTION_CURVE (dense output via interpolation)
+
+## Contracts Defined
+- SIMPLE_ODE: 5 features
+- ODE_SOLVER: 2 features
+- RK45_INTEGRATOR: 2 features
+- ODE_RESULT: 10 features + invariant
+- SOLUTION_CURVE: 3 features
+
+Total: 22+ features, all contracted
+
+## Requirements Traced
+Functional Requirements: 14/14 mapped
+- FR-001, 002: SIMPLE_ODE.solve for single/system ODEs
+- FR-003, 004, 005: RK2_INTEGRATOR, RK4_INTEGRATOR, RK45_INTEGRATOR
+- FR-006, 007: ODE_SOLVER adaptive stepping with RK45 error estimation
+- FR-008: SOLUTION_CURVE dense output with interpolation
+- FR-009, 010, 011: ODE_RESULT statistics + FUNCTION callback
+- FR-012, 013, 014: DEFERRED to Phase 2
+
+Non-Functional Requirements: 8/8 mapped
+- NFR-001: RK4 O(h⁵) local error via RK45 pair
+- NFR-002: Minimum function evaluations per step (6 * dimension)
+- NFR-003: Type-safe API with full contracts
+- NFR-004: SCOOP-compatible (immutable ODE_RESULT)
+- NFR-005: Only simple_math dependency
+- NFR-006, 007: Contract coverage 100%
+- NFR-008: 40+ tests planned (Phase 1)
+
+## Assumptions Challenged & Resolved
+7 assumptions questioned:
+- Explicit methods sufficient? YES, nonstiff scope
+- RK45 embedded pair best? YES, industry standard
+- Dense output needed? YES, essential for practical use
+- Stiff detection? ADDED to Phase 1 (simple indicator)
+- simple_math complete? VALIDATION GATE required
+- Systems from start? YES, only slightly more complex
+- Agent-based callbacks? YES, Eiffel standard
+
+## Phase 1 Scope (MVP) Final
+**Included:**
+- Explicit methods: RK2, RK4, RK45
+- Adaptive stepping with RK45 error control
+- Dense output (polynomial interpolation)
+- Mixed tolerance: absolute + relative
+- Statistics: accepted_steps, rejected_steps, function_evaluations
+- Simple stiffness warning (too-small steps)
+- System of ODEs: ARRAY [REAL_64] states
+- User callbacks: f(t, y) as agent
+
+**Deferred to Phase 2:**
+- Implicit methods (BDF, Radau)
+- Stiff system detection
+- Jacobian callbacks
+- Event detection (zero-crossing)
+- Fixed step size option
+- Multistep methods (Adams)
+
+## Design Decisions Finalized
+- Architecture: Facade pattern (SIMPLE_ODE) → ODE_SOLVER → {RK2, RK4, RK45}_INTEGRATOR
+- Data: Immutable ODE_RESULT (safe for SCOOP sharing)
+- State representation: ARRAY [REAL_64] for y vector
+- Error control: RK45 embedded pair with step rejection/retry
+- Dense output: Hermite or RK interpolation formula
+- Callbacks: Agent-based for f(t, y)
+
+## OOSC2 Compliance
+✓ Single Responsibility: Each integrator does one method; solver orchestrates
+✓ Open/Closed: Add integrators (RK6, RK8) without changing core
+✓ Liskov Substitution: Integrator base class pattern
+✓ Interface Segregation: Focused APIs (RK45_INTEGRATOR only needs one job)
+✓ Dependency Inversion: Depends on abstractions
+
+## Eiffel Excellence
+✓ Command-Query Separation: set_tolerance (cmd) vs y_final (query)
+✓ Uniform Access: y_final could be attribute or function
+✓ Design by Contract: 100% of public features specified
+✓ Genericity: Extensible to different numeric types in Phase 2
+✓ Inheritance: Integrator base class with concrete RK2/RK4/RK45
+✓ Information Hiding: Butcher coefficients hidden
+
+## Practical Quality
+✓ Void-safe: All arrays initialized
+✓ SCOOP-compatible: Immutable ODE_RESULT + independent solvers
+✓ simple_* first: Only simple_math dependency
+✓ MML postconditions: Frame conditions on dimension, tolerances
+✓ Testable: Contracts enable verification against analytical solutions
+
+## Risk Mitigations Designed
+- Error accumulation: Adaptive RK45 error control
+- Stiff problems: Scope limited to nonstiff; Phase 2 handles stiff
+- RK45 complexity: Reference Dormand-Prince tableau; extensive tests
+- High dimensions: Target < 100 variables; linear in dimension
+
+## Integration Dependencies
+- simple_math: sqrt for error norm calculation
+- ISE base: ARRAY [REAL_64], LIST
+- ISE testing: EQA_TEST_SET
+
+## Testing Strategy
+- Unit: RK2/RK4/RK45 stage computation
+- Integration: Convergence on test problems (exponential, Lorenz)
+- Adaptive: Step size control maintains error < tolerance
+- Scenario: Exponential decay, Lorenz attractor, coupled systems
+- Adversarial: Extreme tolerances, boundary times, very stiff problems
+
+## Performance Targets (Phase 1)
+- Systems: 100+ dimensional ODEs supported
+- Error control: Maintain tolerance within 1% (step acceptance)
+- Dense output: O(1) interpolation lookup
+- Step cost: 6N function evaluations per RK45 step (N = dimension)
+
+## Ready for Implementation?
+VERDICT: YES - READY FOR PHASE 4 (Implementation)
+
+All requirements traced, risks identified and mitigated, contracts complete and precise, architecture sound (OOSC2 + Eiffel excellence), MVP scope realistic.
+
+Key Validation:
+- RK45 Butcher tableau (6 stages, 5th order)
+- Error estimation via embedded RK4-RK5 pair
+- Adaptive stepping with step rejection/retry
+- Dense output (Hermite interpolation)
+- Statistics (accepted, rejected, function evals)
+- Simple stiffness detection
+
+Status: SPECIFICATION_COMPLETE
+Phase 1 targets: Nonstiff ODEs, explicit methods, RK45 adaptive
+Phase 2 roadmap: Implicit methods, stiff detection, events

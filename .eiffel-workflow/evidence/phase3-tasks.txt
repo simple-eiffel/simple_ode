@@ -1,0 +1,123 @@
+# Phase 3 Task Evidence
+# Project: d:\prod\simple_ode
+# Date: 2026-01-29
+
+Tasks created: 10
+Task groups: 3 (foundation, integrators, orchestration)
+Dependencies identified: 12+ (between tasks)
+Human approved: YES (2026-01-29)
+
+## Task Breakdown
+
+### Foundation Classes (3 tasks)
+1. ODE_STATE - Solution state (t, y, remaining_time)
+2. ODE_RESULT - Integration results (immutable, SCOOP-safe)
+3. SOLUTION_CURVE - Dense output (Hermite interpolation)
+
+### Integration Methods (3 tasks - parallel)
+4. RK2_INTEGRATOR - 2-stage midpoint method (O(h³) local)
+5. RK4_INTEGRATOR - 4-stage standard method (O(h⁵) local)
+6. RK45_INTEGRATOR - 6-stage Dormand-Prince (embedded pair for error estimation)
+
+### Orchestration (3 tasks)
+7. ODE_SOLVER - Main integration loop (adaptive stepping, error control)
+8. SIMPLE_ODE - Facade entry point
+9. Dense Output Builder - Part of ODE_SOLVER
+10. ECF Configuration & Tests - Compilation and skeletal tests
+
+## Execution Strategy
+
+Recommended order: 1 → 2 → 3 → (4,5,6 parallel) → 7 → 8 → 9 → 10
+
+Critical path:
+ODE_STATE → ODE_RESULT → ODE_SOLVER → SIMPLE_ODE
+
+Parallel opportunities:
+- RK2, RK4, RK45 integrators can be implemented concurrently
+- Each integrator is independent (no inter-dependencies)
+
+## Acceptance Criteria Per Task
+
+Each task includes:
+✓ Acceptance criteria (specific, measurable)
+✓ Implementation notes (algorithms, Butcher tableaux)
+✓ Dependencies (which tasks must complete first)
+✓ Test strategy (convergence on standard problems)
+
+Example (Task 8: RK45_INTEGRATOR):
+- Dormand-Prince 6-stage method
+- Both RK4 (5th order) and RK5 (4th order) approximations
+- Error estimation via ||y_rk4 - y_rk5||
+- Adaptive stepping: increase dt if error < tol/2, decrease if > tol
+- Test: Exponential decay, Lorenz system, error control verification
+
+## Contract Completeness
+
+Every task includes:
+✓ Preconditions (input validation)
+✓ Postconditions (output correctness, error bounds)
+✓ Invariants (state consistency)
+✓ MML model queries (where applicable)
+
+## Phase 4 Integration Gate
+
+Before implementation begins, verify:
+- [ ] simple_math provides sqrt, sin, cos
+- [ ] ISE base library version ≥ 25.02
+- [ ] void_safety="all" configuration supported
+- [ ] SCOOP concurrency enabled
+- [ ] EiffelStudio compiler ready
+
+## Risk Areas Identified
+
+1. **RK45 Embedded Pair (Task 6):**
+   - Complex 6-stage algorithm
+   - Dormand-Prince Butcher tableau must be exact
+   - Mitigation: Reference published coefficients, verify order
+
+2. **Adaptive Stepping (Task 7):**
+   - Step size control is critical for efficiency
+   - Mitigation: Extensive testing on stiff/smooth problems
+
+3. **Dense Output (Task 9):**
+   - Hermite interpolation accuracy must match RK4 order
+   - Mitigation: Test interpolated values against integration grid
+
+## Success Factors
+
+1. Accurate numerical implementation of Butcher tableaux
+2. Careful error estimation in RK45 pair
+3. Robust adaptive stepping algorithm
+4. Extensive convergence testing
+5. Contract-driven development
+
+## Integrator Complexity Summary
+
+| Integrator | Stages | Order | Cost/step | Use |
+|-----------|--------|-------|-----------|-----|
+| RK2 | 2 | O(h³) local | 2 f-evals | Simple tests |
+| RK4 | 4 | O(h⁵) local | 4 f-evals | Standard use |
+| RK45 | 6 | O(h⁵) local, O(h⁴) error | 6 f-evals | Adaptive stepping |
+
+## Dependencies Summary
+
+Total edges in dependency graph: 12+
+
+Most connected: ODE_RESULT (required by ODE_SOLVER)
+Least connected: RK2/RK4/RK45 (only used by ODE_SOLVER)
+
+No circular dependencies identified.
+
+## File Locations
+
+Tasks file: d:\prod\simple_ode\.eiffel-workflow\tasks.md
+Evidence: d:\prod\simple_ode\.eiffel-workflow\evidence\phase3-tasks.txt
+Specifications: d:\prod\simple_ode\.eiffel-workflow\spec\01-08 (*.md)
+
+## Status
+
+Phase 3: TASKS DEFINED
+Phase 4: AWAITING HUMAN APPROVAL
+
+Total implementation effort estimate: HIGH (adaptive algorithms, error control)
+Recommended parallelization: RK2/RK4/RK45 after Task 3 complete
