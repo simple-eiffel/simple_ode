@@ -11,8 +11,8 @@
 		</capability>
 		<library name="base" location="$ISE_LIBRARY/library/base/base.ecf"/>
 		<library name="testing" location="$ISE_LIBRARY/library/testing/testing.ecf"/>
-		<library name="simple_math" location="d:\prod\simple_math\simple_math.ecf"/>
-		<library name="simple_mml" location="d:\prod\simple_mml\simple_mml.ecf"/>
+		<library name="simple_math" location="$SIMPLE_EIFFEL/simple_math/simple_math.ecf"/>
+		<library name="simple_mml" location="$SIMPLE_EIFFEL/simple_mml/simple_mml.ecf"/>
 		<cluster name="src" location=".\src\" recursive="true"/>
 	</target>
 	<target name="simple_ode_tests">
@@ -26,9 +26,9 @@
 		</capability>
 		<library name="base" location="$ISE_LIBRARY/library/base/base.ecf"/>
 		<library name="testing" location="$ISE_LIBRARY/library/testing/testing.ecf"/>
-		<library name="simple_math" location="d:\prod\simple_math\simple_math.ecf"/>
-		<library name="simple_mml" location="d:\prod\simple_mml\simple_mml.ecf"/>
-		<library name="simple_testing" location="d:\prod\simple_testing\simple_testing.ecf"/>
+		<library name="simple_math" location="$SIMPLE_EIFFEL/simple_math/simple_math.ecf"/>
+		<library name="simple_mml" location="$SIMPLE_EIFFEL/simple_mml/simple_mml.ecf"/>
+		<library name="simple_testing" location="$SIMPLE_EIFFEL/simple_testing/simple_testing.ecf"/>
 		<cluster name="src" location=".\src\" recursive="true"/>
 		<cluster name="test" location=".\test\" recursive="true"/>
 	</target>
